@@ -15,6 +15,7 @@ class Edge {
   }
 }
 
+// TODO: Optimize.
 function findMinCuts(vertices, edges) {
   while (vertices.length > 2) {
     // Pick a random edge.
