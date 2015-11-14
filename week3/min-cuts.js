@@ -1,6 +1,7 @@
 'use strict';
 
 const bufferStdin = require('../lib/buffer-stdin');
+const parseMatrix = require('../lib/parse-matrix');
 
 class Vertex {
   constructor(nums) {
@@ -81,9 +82,7 @@ if (require.main === module) {
       return;
     }
 
-    const lines = input.split('\n')
-      .filter((line) => line.length > 0)
-      .map((line) => line.split(/\s/).map((n) => parseInt(n, 10)));
+    const lines = parseMatrix(input);
 
     const vertices = [];
     for (let i = 1; i <= lines.length; i++) {

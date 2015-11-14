@@ -35,3 +35,17 @@ node week2/quick-sort.test.js
 ```sh
 cat week3/kargerMinCut.txt | node week3/min-cuts.js
 ```
+
+## week 4
+
+Increase stack size to avoid `RangeError: Maximum call stack size exceeded`.
+
+```sh
+cat week4/SCC.txt.gz | zcat | node --stack-size=32000 week4/scc.js
+```
+
+Run unit tests:
+
+```sh
+node week4/scc.test.js
+```
