@@ -10,37 +10,31 @@ class Value {
   }
 }
 
+function randomNumbers(max, size) {
+  const result = new Array(size);
+  for (let i = 0; i < size; i++) {
+    result[i] = Math.floor(Math.random() * max);
+  }
+  return result;
+}
+
 const heap = new Heap((v) => v.value);
 assert(heap.isEmpty());
 assert.equal(heap.size(), 0);
 
-heap.insert(new Value(5));
-assert(!heap.isEmpty());
-assert.equal(heap.size(), 1);
+const nums = randomNumbers(10000, 100000);
+const sortedNums = nums.slice().sort((a, b) => a - b);
 
-heap.insert(new Value(4));
-heap.insert(new Value(10));
-heap.insert(new Value(8));
-heap.insert(new Value(15));
-heap.insert(new Value(3));
-heap.insert(new Value(4));
-heap.insert(new Value(9));
-heap.insert(new Value(-3));
-heap.insert(new Value(-8));
-heap.insert(new Value(20));
-assert.equal(heap.size(), 11);
+for (let i = 0; i < nums.length; i++) {
+  heap.insert(new Value(nums[i]));
+  assert(!heap.isEmpty());
+  assert.equal(heap.size(), i + 1);
+}
 
-assert.equal(heap.deleteMin().value, -8);
-assert.equal(heap.deleteMin().value, -3);
-assert.equal(heap.deleteMin().value, 3);
-assert.equal(heap.deleteMin().value, 4);
-assert.equal(heap.deleteMin().value, 4);
-assert.equal(heap.deleteMin().value, 5);
-assert.equal(heap.deleteMin().value, 8);
-assert.equal(heap.deleteMin().value, 9);
-assert.equal(heap.deleteMin().value, 10);
-assert.equal(heap.deleteMin().value, 15);
-assert.equal(heap.deleteMin().value, 20);
+for (let i = 0; i < sortedNums.length; i++) {
+  assert.equal(heap.deleteMin().value, sortedNums[i]);
+  assert.equal(heap.size(), sortedNums.length - (i + 1));
+}
 assert(heap.isEmpty());
 
 assert.throws(() => heap.deleteMin());
