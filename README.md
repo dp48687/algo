@@ -49,3 +49,11 @@ Run unit tests:
 ```sh
 node week4/scc.test.js
 ```
+
+## week 5
+
+Heap and unit tests:
+
+```sh
+node week5/heap.test.js
+```
