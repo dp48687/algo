@@ -52,6 +52,10 @@ node week4/scc.test.js
 
 ## week 5
 
+```sh
+cat week5/dijkstraData.txt | node week5/dijkstra.js
+```
+
 Heap and unit tests:
 
 ```sh
