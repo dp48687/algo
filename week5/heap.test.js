@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 
-const Heap = require('./heap');
+const MinHeap = require('./heap').MinHeap;
 
 class Value {
   constructor(value) {
@@ -18,7 +18,7 @@ function randomNumbers(max, size) {
   return result;
 }
 
-const heap = new Heap((v) => v.value);
+const heap = new MinHeap((v) => v.value, true);
 assert(heap.isEmpty());
 assert.equal(heap.size(), 0);
 

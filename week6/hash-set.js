@@ -39,7 +39,25 @@ class HashSet {
 
   // TODO: Improve.
   calcHash(key) {
-    return key % this.n;
+    if (key < 0) {
+      return (-key) % this.n;
+    } else {
+      return key % this.n;
+    }
+  }
+
+  *[Symbol.iterator]() {
+    for (let i = 0; i < this.buckets.length; i++) {
+      const bucket = this.buckets[i];
+      if (bucket === undefined) {
+        continue;
+      }
+      let node = bucket.root;
+      while (node !== null) {
+        yield node.value;
+        node = node.next;
+      }
+    }
   }
 }
 

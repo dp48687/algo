@@ -64,6 +64,18 @@ node week5/heap.test.js
 
 ## week 6
 
+Question 1:
+
+```sh
+cat week6/algo1-programming_prob-2sum.txt | node week6/two-sum.js
+```
+
+Question 2:
+
+```sh
+cat week6/Median.txt | node week6/median-maintenance.js
+```
+
 Hash set and unit tests:
 
 ```sh

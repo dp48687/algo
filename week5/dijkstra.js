@@ -1,7 +1,7 @@
 'use strict';
 
 const bufferStdin = require('../lib/buffer-stdin');
-const Heap = require('./heap');
+const MinHeap = require('./heap').MinHeap;
 
 class Edge {
   constructor(from, to, distance) {
@@ -30,7 +30,7 @@ function findShortestPaths(sourceIndex, vertices) {
   const vertexCount = vertices.filter(Boolean).length;
 
   // Keep (V - X) vertices that are reachable from X vertices at the time.
-  const heap = new Heap((vertex) => vertex.shortestDistance);
+  const heap = new MinHeap((vertex) => vertex.shortestDistance, true);
 
   const source = vertices[sourceIndex];
   source.shortestDistance = 0;

@@ -1,23 +1,35 @@
 'use strict';
 
 // A min heap that keeps track of index in the array of each node.
-// Each node's heap index is set as its `heapIndex` property.
+// If `keepHeapIndex` is true, each node's heap index is set as its
+// `heapIndex` property.
 class Heap {
-  constructor(keyFunc) {
+  constructor(keyFunc, keepHeapIndex) {
     this.keyFunc = keyFunc;
+    this.keepHeapIndex = keepHeapIndex === true;
     this.nodes = [];
   }
 
   insert(node) {
     this.nodes.push(node);
-    node.heapIndex = this.nodes.length - 1;
+    if (this.keepHeapIndex) {
+      node.heapIndex = this.nodes.length - 1;
+    }
 
     if (this.nodes.length > 1) {
       this._bubbleUp();
     }
   }
 
-  deleteMin() {
+  top() {
+    if (this.isEmpty()) {
+      throw new Error('Empty heap');
+    } else {
+      return this.nodes[0];
+    }
+  }
+
+  deleteTop() {
     if (this.isEmpty()) {
       throw new Error('Empty heap');
     }
@@ -28,11 +40,15 @@ class Heap {
       this.nodes.length = 0;
     } else {
       this.nodes[0] = this.nodes.pop();
-      this.nodes[0].heapIndex = 0;
+      if (this.keepHeapIndex) {
+        this.nodes[0].heapIndex = 0;
+      }
       this._bubbleDown(0);
     }
 
-    min.heapIndex = null;
+    if (this.keepHeapIndex) {
+      min.heapIndex = null;
+    }
     return min;
   }
 
@@ -45,13 +61,17 @@ class Heap {
       return this.deleteMin();
     } else if (index === this.nodes.length - 1) {
       const node = this.nodes.pop();
-      node.heapIndex = null;
+      if (this.keepHeapIndex) {
+        node.heapIndex = null;
+      }
       return node;
     } else {
       const node = this.nodes[index];
-      node.heapIndex = null;
       this.nodes[index] = this.nodes.pop();
-      this.nodes[index].heapIndex = index;
+      if (this.keepHeapIndex) {
+        node.heapIndex = null;
+        this.nodes[index].heapIndex = index;
+      }
       this._bubbleDown(index);
       return node;
     }
@@ -80,15 +100,17 @@ class Heap {
       const parentKey = this._getKey(parent);
 
       // Break if the heap property has been restored.
-      if (nodeKey >= parentKey) {
+      if (this.compare(parentKey, nodeKey)) {
         break;
       }
 
       // Swap with parent.
       this.nodes[index] = parent;
-      parent.heapIndex = index;
       this.nodes[parentIndex] = node;
-      node.heapIndex = parentIndex;
+      if (this.keepHeapIndex) {
+        parent.heapIndex = index;
+        node.heapIndex = parentIndex;
+      }
       index = parentIndex;
     }
   }
@@ -113,14 +135,16 @@ class Heap {
 
       if (childIndex2 > this.nodes.length - 1) {
         // Only one child === the bottom level.
-        if (nodeKey <= childKey1) {
+        if (this.compare(nodeKey, childKey1)) {
           break;
         }
         // Swap with child.
         this.nodes[index] = child1;
-        child1.heapIndex = index;
         this.nodes[childIndex1] = node;
-        node.heapIndex = childIndex1;
+        if (this.keepHeapIndex) {
+          child1.heapIndex = index;
+          node.heapIndex = childIndex1;
+        }
 
         break;
       } else {
@@ -128,28 +152,36 @@ class Heap {
         const child2 = this.nodes[childIndex2];
         const childKey2 = this._getKey(child2);
 
-        if (nodeKey <= childKey1 && nodeKey <= childKey2) {
+        if (this.compare(nodeKey, childKey1) && this.compare(nodeKey, childKey2)) {
           break;
         }
 
-        // Swap with the smaller child.
-        if (childKey1 < childKey2) {
+        // Swap with the child that is suitable for parent.
+        if (this.compare(childKey1, childKey2)) {
           this.nodes[index] = child1;
-          child1.heapIndex = index;
           this.nodes[childIndex1] = node;
-          node.heapIndex = childIndex1;
+          if (this.keepHeapIndex) {
+            child1.heapIndex = index;
+            node.heapIndex = childIndex1;
+          }
 
           index = childIndex1;
         } else {
           this.nodes[index] = child2;
-          child2.heapIndex = index;
           this.nodes[childIndex2] = node;
-          node.heapIndex = childIndex2;
+          if (this.keepHeapIndex) {
+            child2.heapIndex = index;
+            node.heapIndex = childIndex2;
+          }
 
           index = childIndex2;
         }
       }
     }
+  }
+
+  compare(parent, child) {
+    throw new Error('Not implemented');
   }
 
   // TODO: O(n log n) -> O(n)
@@ -163,4 +195,37 @@ class Heap {
   }
 }
 
-module.exports = Heap;
+class MinHeap extends Heap {
+  min() {
+    return this.top();
+  }
+
+  deleteMin() {
+    return this.deleteTop();
+  }
+
+  // Returns true if the keys keeps the heap property.
+  compare(parentKey, childKey) {
+    return parentKey <= childKey;
+  }
+}
+
+class MaxHeap extends Heap {
+  max() {
+    return this.top();
+  }
+
+  deleteMax() {
+    return this.deleteTop();
+  }
+
+  // Returns true if the keys keeps the heap property.
+  compare(parentKey, childKey) {
+    return parentKey >= childKey;
+  }
+}
+
+module.exports = {
+  MaxHeap: MaxHeap,
+  MinHeap: MinHeap
+};

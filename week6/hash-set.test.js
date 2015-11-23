@@ -21,6 +21,19 @@ for (let i = 0; i < 10000; i++) {
 
 console.log('OK: Insertion');
 
+// Assert iteration.
+const found = new Set();
+let count = 0;
+for (let value of set) {
+  assert(value % 3 === 0, `${value} should be a multiple of 3`);
+  assert(!found.has(value), `Duplicated value ${value} from iterator`);
+  found.add(value);
+  count++;
+}
+assert.equal(count, 3334);
+
+console.log('OK: Iteration');
+
 // Assert deletion.
 for (let i = 0; i < 10000; i += 6) {
   set.delete(i);
