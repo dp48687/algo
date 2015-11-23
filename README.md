@@ -61,3 +61,11 @@ Heap and unit tests:
 ```sh
 node week5/heap.test.js
 ```
+
+## week 6
+
+Hash set and unit tests:
+
+```sh
+node week6/hash-set.test.js
+```
