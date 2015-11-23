@@ -1,6 +1,7 @@
 'use strict';
 
 const bufferStdin = require('../lib/buffer-stdin');
+const Heap = require('./heap');
 
 class Edge {
   constructor(from, to, distance) {
@@ -13,6 +14,7 @@ class Edge {
 class Vertex {
   constructor(index) {
     this.index = index;
+    this.heapIndex = null;
 
     this.shortestDistance = null;
     this.shortestPath = null;
@@ -20,43 +22,56 @@ class Vertex {
   }
 }
 
-// TODO: Use heap!
-// OPTIONAL: For those of you seeking an additional challenge, try implementing
-// the heap-based version. Note this requires a heap that supports deletions,
-// and you'll probably need to maintain some kind of mapping between vertices
-// and their positions in the heap.
+// Runs Dijkstra's shortest path algorithm with a heap of vertices with keys of
+// shortest distances from the source vertex. Updates vertices' `shortestDistance`
+// and `shortestPath` as a result.
 function findShortestPaths(sourceIndex, vertices) {
   // If vertices is one-indexed, exclude it from the count.
   const vertexCount = vertices.filter(Boolean).length;
 
+  // Keep (V - X) vertices that are reachable from X vertices at the time.
+  const heap = new Heap((vertex) => vertex.shortestDistance);
+
   const source = vertices[sourceIndex];
   source.shortestDistance = 0;
   source.shortestPath = [];
+  updateHeap(source);
 
-  const X = [source];
+  let X = 1;
 
   // O(mn)
-  while (X.length < vertexCount) {
-    let minDistance = Number.POSITIVE_INFINITY;
-    let minEdge = null;
+  while (X < vertexCount) {
+    const w = heap.deleteMin();
+    X++;
+    updateHeap(w);
+  }
 
-    for (let v of X) {
-      for (let edge of v.edges) {
-        if (edge.to.shortestDistance === null) {
-          const distance = v.shortestDistance + edge.distance;
-          if (distance < minDistance) {
-            minDistance = distance;
-            minEdge = edge;
-          }
+  // Update vertices that have edges from the given vertex.
+  // Each vertex's heap key, shortest distance, is updated only when
+  // a vertex with an edge to it is added.
+  function updateHeap(v) {
+    for (let edge of v.edges) {
+      const distance = v.shortestDistance + edge.distance;
+      const w = edge.to;
+      if (w.shortestDistance === null) {
+        // w has never been in the heap.
+        w.shortestDistance = distance;
+        w.shortestPath = v.shortestPath.concat(w);
+        heap.insert(w);
+      } else {
+        if (w.heapIndex === null) {
+          // w is already in X.
+          continue;
+        }
+        // Update w's key only if it gets shorter distance than it has.
+        if (distance < w.shortestDistance) {
+          heap.deleteAt(w.heapIndex);
+          w.shortestDistance = distance;
+          w.shortestPath = v.shortestPath.concat(w);
+          heap.insert(w);
         }
       }
     }
-
-    const v = minEdge.from;
-    const w = minEdge.to;
-    w.shortestDistance = minDistance;
-    w.shortestPath = v.shortestPath.concat(w.index);
-    X.push(w);
   }
 }
 
@@ -71,6 +86,7 @@ if (require.main === module) {
 
     const vertices = [];
 
+    // Parse the input and create vertices that have edges from them.
     const lines = input.split('\n');
     for (let line of lines) {
       const components = line.split(/\s+/);
